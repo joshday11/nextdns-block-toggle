@@ -130,6 +130,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    # check that block or un-block is set
+    if not args.block and not args.un_block:
+        parser.print_help()
+        sys.exit(-1)
+
     # parse key and build HTTP headers from SECRETS file
     try:
         headers = get_key()
@@ -141,7 +146,11 @@ if __name__ == "__main__":
         sys.exit(-1)
 
     # get blocked domain list
-    (denylist_domains, profile_id) = get_blocked_domains(headers, profile_id = args.nextdns_profile)
+    try:
+        (denylist_domains, profile_id) = get_blocked_domains(headers, profile_id = args.nextdns_profile)
+    except TypeError:
+        print("That didn't work. Try another profile.")
+        sys.exit(-1)
 
     # it would be odd to have no domains in this list. perhaps we hit an error somewhere.
     if len(denylist_domains) == 0:
